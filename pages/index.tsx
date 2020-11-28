@@ -1,27 +1,23 @@
-import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
-import Head from 'next/head';
 import React, { Fragment } from 'react';
-import Link from '../components/Link/Link';
-// import styles from '../styles/Home.module.css';
+import { Typography } from '@material-ui/core';
+import { PageHeader } from '../components/PageHeader/PageHeader';
 
-export default function Home(): React.ReactNode {
+const Home: React.FunctionComponent = () => {
   return (
     <Fragment>
-      <Head>
-        <title>Dokku UI</title>
-      </Head>
-      <Container maxWidth="sm">
-        <Box my={4}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Next.js example
-          </Typography>
-          <Link href="/about" color="secondary">
-            Go to the about page
-          </Link>
-        </Box>
-      </Container>
+      <PageHeader title="Dashboard" />
+      <Typography>
+        It'd be nice to show some stats here which include:
+      </Typography>
+      <ul>
+        <li>
+          Host system stats (disk usage, cpu usage, memory usage) - similar to
+          mailinabox
+        </li>
+        <li>Dokku stats: eg running apps</li>
+      </ul>
     </Fragment>
   );
-}
+};
+
+export default Home;

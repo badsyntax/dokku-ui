@@ -1,9 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-var-requires */
 const net = require('net');
 
 const socketPath = '/tmp/my.unix.sock';
 
-const server = net
+net
   .createServer()
   .on('connection', (stream) => {
     console.log('Server: client connected');
@@ -15,10 +15,11 @@ const server = net
     });
 
     stream.on('data', (msg) => {
-      console.log('Server: got client message:', msg);
-      switch (msg.toString()) {
+      const command = msg.toString('utf-8').replace(/--[a-z]+\s/g, '');
+      console.log('Server: got command:', command);
+      switch (command) {
         case 'apps:list':
-          stream.write(['app1', 'app2'].join('\n'));
+          stream.write('{"ok":true,"output":"demo-app\nnew-app"}');
       }
     });
   })
