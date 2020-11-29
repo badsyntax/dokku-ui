@@ -1,6 +1,5 @@
-const net = require('net');
-
-const socketPath = '/tmp/my.unix.sock';
+import net from 'net';
+import { DOKKU_SOCKET_PATH } from '../constants/constants';
 
 net
   .createServer()
@@ -22,8 +21,10 @@ net
       switch (command) {
         case 'apps:list':
           stream.write('{"ok":true,"output":"demo-app\nnew-app"}');
+          break;
         case 'storage:list':
           stream.write('{"ok":true,"output":"demo-app\nnew-app"}');
+          break;
         default:
           stream.write(
             `{"ok":false,"output":"Command '${command}' not mocked"}`
@@ -34,6 +35,6 @@ net
   .on('close', () => {
     console.log('Server: shut down');
   })
-  .listen(socketPath, () => {
-    console.log('Server bound to socket at path:', socketPath);
+  .listen(DOKKU_SOCKET_PATH, () => {
+    console.log('Server bound to socket at path:', DOKKU_SOCKET_PATH);
   });

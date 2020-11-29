@@ -5,11 +5,12 @@
   "scripts": {
     "predev": "npm run compile",
     "prestart": "npm run compile",
+    "prestart:mock-dokku": "npm run compile",
     "compile": "tsc --project tsconfig.server.json",
     "dev": "node server",
     "build": "next build",
     "start": "NODE_ENV=production node server",
-    "start:mock-dokku": "rm -f /tmp/my.unix.sock && cd dokku && node mockSocketServer"
+    "start:mock-dokku": "rm -f /tmp/dokku-daemon.sock && cd dokku && node mockSocketServer"
   },
   "dependencies": {
     "@emotion/cache": "^11.0.0",
