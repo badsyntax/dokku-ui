@@ -42,7 +42,11 @@ export const PageHeader: React.FunctionComponent<PageHeaderProps> = ({
           )}
           <Typography variant="h5">{title}</Typography>
         </Breadcrumbs>
-        <Box>{pageActions.map((pageAction) => pageAction)}</Box>
+        <Box>
+          {pageActions.map((pageAction, i) => (
+            <Fragment key={i}>{pageAction}</Fragment>
+          ))}
+        </Box>
       </Box>
     </Fragment>
   );

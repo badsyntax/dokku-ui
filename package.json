@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "build": "next build",
-    "start": "next start"
+    "start": "NODE_ENV=production node server.js"
   },
   "dependencies": {
     "@emotion/cache": "^11.0.0",
@@ -35,11 +35,35 @@
   },
   "eslintConfig": {
     "extends": [
-      "plugin:jsx-a11y/recommended",
-      "plugin:react-hooks/recommended",
-      "plugin:@typescript-eslint/recommended",
-      "prettier/@typescript-eslint",
+      "eslint:recommended",
       "plugin:prettier/recommended"
+    ],
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "overrides": [
+      {
+        "files": [
+          "*.{ts,tsx}"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+          "@typescript-eslint"
+        ],
+        "extends": [
+          "plugin:jsx-a11y/recommended",
+          "plugin:react-hooks/recommended",
+          "plugin:@typescript-eslint/recommended",
+          "prettier/@typescript-eslint"
+        ],
+        "parserOptions": {
+          "project": "./tsconfig.json"
+        }
+      }
     ]
   },
   "prettier": {
