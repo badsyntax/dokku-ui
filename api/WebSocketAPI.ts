@@ -11,7 +11,7 @@ export class WebSocketAPI {
   private subscriptions: WsMessageSubscription[] = [];
   constructor(private readonly url: string) {
     try {
-      this.socket = new WebSocket(url);
+      this.socket = new WebSocket(this.url);
       this.socket.addEventListener('error', this.handleError);
       this.socket.addEventListener('message', this.handleMessage);
       this.socket.addEventListener('open', this.handleOpen);
@@ -37,7 +37,6 @@ export class WebSocketAPI {
   };
 
   private callSubscriptions(message: WsServerMessage<any>) {
-    console.log('callSubscriptions', message);
     this.subscriptions.forEach((subscription) => {
       if (subscription.message.command === message.command) {
         subscription.callback(message);

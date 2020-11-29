@@ -8,7 +8,8 @@
     "compile": "tsc --project tsconfig.server.json",
     "dev": "node server",
     "build": "next build",
-    "start": "NODE_ENV=production node server"
+    "start": "NODE_ENV=production node server",
+    "start:mock-dokku": "rm -f /tmp/my.unix.sock && cd dokku && node mockSocketServer"
   },
   "dependencies": {
     "@emotion/cache": "^11.0.0",
@@ -40,9 +41,7 @@
   },
   "eslintConfig": {
     "ignorePatterns": [
-      "api/**/*.js",
-      "server/**/*.js",
-      "constants/**/*.js"
+      "**/*.js"
     ],
     "extends": [
       "eslint:recommended",

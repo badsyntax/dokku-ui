@@ -1,16 +1,17 @@
 import WebSocket from 'ws';
 import { dockerClient } from '../docker/DockerClient';
-import { WsClientMessage, WsServerMessage } from '../api/types';
+import { WsClientMessage, WsCommands, WsServerMessage } from '../api/types';
 import { Stream, Writable } from 'stream';
 import { WS_SERVER_PORT } from '../constants/constants';
+import { ContainerStats } from 'dockerode';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isStream(stream: any): stream is Stream {
   return 'pipe' in stream;
 }
 
 async function streamContainerStats(
   clientMessage: WsClientMessage,
-  server: WebSocket.Server,
   socket: WebSocket,
   containerId: string
 ) {
@@ -18,12 +19,11 @@ async function streamContainerStats(
   const statsStream = await container.stats({
     stream: true,
   });
-
   if (isStream(statsStream)) {
     statsStream.pipe(
       new Writable({
         write(chunk, encoding, next) {
-          const serverMessage: WsServerMessage = {
+          const serverMessage: WsServerMessage<ContainerStats> = {
             command: clientMessage.command,
             data: JSON.parse(chunk.toString('utf-8')),
           };
@@ -40,27 +40,11 @@ function handleSocketMessage(
   socket: WebSocket
 ): (message: string) => void {
   return (message) => {
-    const parsedMessage = JSON.parse(message) as WsClientMessage;
-    switch (parsedMessage.command) {
-      case 'getAppData': {
+    const clientMessage = JSON.parse(message) as WsClientMessage;
+    switch (clientMessage.command) {
+      case WsCommands.getAppData: {
         const containerId = 'ced37f5c3493';
-        streamContainerStats(parsedMessage, server, socket, containerId);
-        // condockerClient.getContainer
-        // ({
-        //   filters: {
-        //     dangling: {
-        //       true: true,
-        //     },
-        //   },
-        // }),
-
-        // const message: WsServerMessage = {
-        //   command: parsedMessage.command,
-        //   data: {
-        //     name: parsedMessage.options.app,
-        //   },
-        // };
-        // socket.send(JSON.stringify(message));
+        streamContainerStats(clientMessage, socket, containerId);
         break;
       }
     }
@@ -73,7 +57,7 @@ const initWsRouter = (server: WebSocket.Server) => (
   socket.on('message', handleSocketMessage(server, socket));
 };
 
-export const initWebSocketServer = () => {
+export const initWebSocketServer = (): void => {
   const wsServer = new WebSocket.Server({ port: WS_SERVER_PORT });
   wsServer.on('connection', initWsRouter(wsServer));
   console.log(`> WebSocket server started on ws://localhost:${WS_SERVER_PORT}`);

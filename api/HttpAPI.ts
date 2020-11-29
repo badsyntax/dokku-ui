@@ -1,10 +1,10 @@
 export class HttpAPI {
   constructor(private readonly basePath: string) {}
 
-  protected makeRequest<T>(
+  protected makeRequest<ResponseType>(
     url: string,
     accept: 'application/json' | 'text/html'
-  ): Promise<T> {
+  ): Promise<ResponseType> {
     return fetch(`${this.basePath}/${url}`, {
       headers: {
         Accept: accept,
@@ -29,7 +29,7 @@ export class HttpAPI {
       });
   }
 
-  protected getJson<T>(url: string): Promise<T> {
-    return this.makeRequest<T>(url, 'application/json');
+  protected getJson<ResponseType>(url: string): Promise<ResponseType> {
+    return this.makeRequest<ResponseType>(url, 'application/json');
   }
 }

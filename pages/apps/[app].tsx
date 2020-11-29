@@ -26,19 +26,10 @@ const Apps: React.FunctionComponent = () => {
       const { streamingAPI } = await import(
         /* webpackChunkName: 'StreamingApi' */ '../../api/SteamingAPI'
       );
-      streamingAPI.getAppData(
+      const unsubscribe = streamingAPI.getAppData(
         appName,
         (message: WsServerMessage<ContainerStats>) => {
-          const cpuDelta =
-            message.data.cpu_stats.cpu_usage.total_usage -
-            message.data.precpu_stats.cpu_usage.total_usage;
-          const systemDelta =
-            message.data.cpu_stats.system_cpu_usage -
-            message.data.precpu_stats.system_cpu_usage;
-          const RESULT_CPU_USAGE = (cpuDelta / systemDelta) * 100;
-          console.log('cpuDelta', cpuDelta);
-          console.log('systemDelta', systemDelta);
-          console.log('RESULT_CPU_USAGE', RESULT_CPU_USAGE);
+          // TODO: update state
         }
       );
       const { dokkuApi } = await import(
@@ -50,6 +41,9 @@ const Apps: React.FunctionComponent = () => {
         .finally(() => setIsLoading(false));
     }
     fetchData();
+    return () => {
+      // FIXME: kill the stream
+    };
   }, [appName]);
 
   return (

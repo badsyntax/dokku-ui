@@ -14,3 +14,7 @@ export interface WsMessageSubscription<T = any> {
   message: WsClientMessage;
   callback: WsMessageCallback<T>;
 }
+
+export enum WsCommands {
+  getAppData = 'getAppData',
+}

@@ -1,6 +1,6 @@
 import { ContainerStats } from 'dockerode';
 import { WS_SERVER_PORT } from '../constants/constants';
-import { WsMessageCallback } from './types';
+import { WsCommands, WsMessageCallback } from './types';
 import { WebSocketAPI } from './WebSocketAPI';
 
 export class StreamingAPI extends WebSocketAPI {
@@ -10,7 +10,7 @@ export class StreamingAPI extends WebSocketAPI {
   ): Promise<() => void> {
     return this.sendMessage<ContainerStats>(
       {
-        command: 'getAppData',
+        command: WsCommands.getAppData,
         options: {
           app,
         },
