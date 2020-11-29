@@ -1,17 +1,17 @@
 import {
-  MessageSubscription,
-  ServerMessage,
-  ClientMessage,
-  MessageCallback,
-} from '../ws/types';
+  WsMessageSubscription,
+  WsServerMessage,
+  WsClientMessage,
+  WsMessageCallback,
+} from './types';
 
 export class WebSocketAPI {
   private isReady = false;
   private socket: WebSocket;
-  private subscriptions: MessageSubscription[] = [];
+  private subscriptions: WsMessageSubscription[] = [];
   constructor(private readonly url: string) {
     try {
-      this.socket = new window.WebSocket(url);
+      this.socket = new WebSocket(url);
       this.socket.addEventListener('error', this.handleError);
       this.socket.addEventListener('message', this.handleMessage);
       this.socket.addEventListener('open', this.handleOpen);
@@ -28,7 +28,7 @@ export class WebSocketAPI {
     try {
       this.callSubscriptions(JSON.parse(event.data));
     } catch (e) {
-      console.error('Unable to parse message:', e.message);
+      console.error('Unable to parse message:', e.message, event.data);
     }
   };
 
@@ -36,7 +36,8 @@ export class WebSocketAPI {
     console.error('WS error', event);
   };
 
-  private callSubscriptions(message: ServerMessage) {
+  private callSubscriptions(message: WsServerMessage<any>) {
+    console.log('callSubscriptions', message);
     this.subscriptions.forEach((subscription) => {
       if (subscription.message.command === message.command) {
         subscription.callback(message);
@@ -44,11 +45,11 @@ export class WebSocketAPI {
     });
   }
 
-  private subscribe(subscription: MessageSubscription) {
+  private subscribe(subscription: WsMessageSubscription) {
     this.subscriptions.push(subscription);
   }
 
-  private unsubscribe(subscription: MessageSubscription) {
+  private unsubscribe(subscription: WsMessageSubscription) {
     this.subscriptions.splice(this.subscriptions.indexOf(subscription), 1);
   }
 
@@ -63,9 +64,9 @@ export class WebSocketAPI {
     });
   }
 
-  protected async sendMessage(
-    message: ClientMessage,
-    callback: MessageCallback
+  protected async sendMessage<T>(
+    message: WsClientMessage,
+    callback: WsMessageCallback<T>
   ): Promise<() => void> {
     await this.waitForReady();
     const subscription = {

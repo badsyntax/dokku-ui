@@ -1,8 +1,14 @@
-import { MessageCallback, WebSocketAPI } from './WebSocketAPI';
+import { ContainerStats } from 'dockerode';
+import { WS_SERVER_PORT } from '../constants/constants';
+import { WsMessageCallback } from './types';
+import { WebSocketAPI } from './WebSocketAPI';
 
 export class StreamingAPI extends WebSocketAPI {
-  getAppData(app: string, callback: MessageCallback): Promise<() => void> {
-    return this.sendMessage(
+  getAppData(
+    app: string,
+    callback: WsMessageCallback<ContainerStats>
+  ): Promise<() => void> {
+    return this.sendMessage<ContainerStats>(
       {
         command: 'getAppData',
         options: {
@@ -14,4 +20,6 @@ export class StreamingAPI extends WebSocketAPI {
   }
 }
 
-export const streamingAPI = new StreamingAPI('ws://localhost:8080');
+export const streamingAPI = new StreamingAPI(
+  `ws://localhost:${WS_SERVER_PORT}`
+);

@@ -14,6 +14,7 @@ export default async (
   // dokku storage:list gr20-discourse
   // dokku resource:limit gr20-discourse
   // dokku scheduler-docker-local:report
+  // dokku report app
   const {
     query: { app },
   } = req;
