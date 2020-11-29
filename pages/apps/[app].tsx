@@ -1,12 +1,13 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { CircularProgress } from '@material-ui/core';
+import { Button, CircularProgress } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import { PageHeader } from '../../features/layout/PageHeader/PageHeader';
 import { dokkuApi } from '../../api/DokkuAPI';
 import { App } from '../../dokku/types';
 import { AppDetail } from '../../features/apps/AppDetail/AppDetail';
 import { DokkuClientError } from '../../features/layout/DokkuClientError/DokkuClientError';
-
+import MenuIcon from '@material-ui/icons/Menu';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 const Apps: React.FunctionComponent = () => {
   const [app, setApp] = useState<App>(null);
   const [error, setError] = useState<Error>(null);
@@ -28,7 +29,14 @@ const Apps: React.FunctionComponent = () => {
 
   return (
     <Fragment>
-      <PageHeader title={pageTitle} />
+      <PageHeader
+        title={pageTitle}
+        section={{
+          title: 'Apps',
+          url: '/apps',
+        }}
+        pageActions={[<Button variant="contained">Actions</Button>]}
+      />
       {isLoading && <CircularProgress />}
       {!isLoading && app && <AppDetail app={app} />}
       {!isLoading && error && <DokkuClientError error={error} />}

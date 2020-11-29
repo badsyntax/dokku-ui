@@ -18,7 +18,6 @@ export class IPCClient {
 
   private handleConnect = (): void => {
     this.isReady = true;
-    console.log('Client: connected to server');
   };
 
   private handleError = (data): void => {
@@ -27,7 +26,6 @@ export class IPCClient {
 
   private handleEnd = (): void => {
     this.isReady = false;
-    console.log('Client: disconnected from server');
   };
 
   protected waitForReady(): Promise<void> {

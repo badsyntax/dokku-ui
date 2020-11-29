@@ -5,12 +5,14 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
   Toolbar,
 } from '@material-ui/core';
 import AirplayIcon from '@material-ui/icons/Airplay';
 import SettingsInputHdmiIcon from '@material-ui/icons/SettingsInputHdmi';
 import SettingsIcon from '@material-ui/icons/Settings';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
 import Link from '../Link/Link';
 import { useStyles } from './styles';
 
@@ -40,6 +42,7 @@ export const Sidebar: React.FunctionComponent = () => {
             </ListItemIcon>
             <ListItemText primary="Dashboard" />
           </ListItem>
+          {/* <ListSubheader>Dokku</ListSubheader> */}
           <ListItem
             button
             key="apps"
@@ -78,6 +81,20 @@ export const Sidebar: React.FunctionComponent = () => {
               <SettingsIcon />
             </ListItemIcon>
             <ListItemText primary="Config" />
+          </ListItem>
+          {/* <ListSubheader>Docker</ListSubheader> */}
+          <ListItem
+            button
+            key="images"
+            component={Link}
+            href="/images"
+            naked
+            activeClassName={classes.navActive}
+          >
+            <ListItemIcon>
+              <PhotoLibraryIcon />
+            </ListItemIcon>
+            <ListItemText primary="Images" />
           </ListItem>
         </List>
       </div>

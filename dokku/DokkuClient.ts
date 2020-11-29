@@ -1,4 +1,4 @@
-import { SOCKET_PATH } from './constants';
+import { DOKKU_SOCKET_PATH } from '../constants/constants';
 import { IPCClient } from './IPCClient';
 
 interface DokkuResponse {
@@ -35,4 +35,4 @@ export class DokkuClient extends IPCClient {
   }
 }
 
-export const dokkuClient = new DokkuClient(SOCKET_PATH);
+export const dokkuClient = new DokkuClient(DOKKU_SOCKET_PATH);

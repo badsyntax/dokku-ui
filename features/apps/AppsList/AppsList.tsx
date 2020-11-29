@@ -8,6 +8,7 @@ import {
   TableCell,
   TableBody,
   IconButton,
+  Typography,
 } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Link from '../../layout/Link/Link';
@@ -50,7 +51,9 @@ export const AppsList: React.FunctionComponent<AppsListProps> = ({ apps }) => {
           {apps.map((app) => (
             <TableRow key={app}>
               <TableCell component="th" scope="row">
-                <Link href={`/apps/${app}`}>{app}</Link>
+                <Typography>
+                  <Link href={`/apps/${app}`}>{app}</Link>
+                </Typography>
               </TableCell>
               <TableCell align="right">
                 <IconButton
