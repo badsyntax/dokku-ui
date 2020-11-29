@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const net = require('net');
 
 const socketPath = '/tmp/my.unix.sock';

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const http = require('http');
 let options = {
   socketPath: '/var/run/docker.sock',

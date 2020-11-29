@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node server.js",
+    "predev": "npm run compile",
+    "prestart": "npm run compile",
+    "compile": "tsc --project tsconfig.server.json",
+    "dev": "node server",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server"
   },
   "dependencies": {
     "@emotion/cache": "^11.0.0",
@@ -17,12 +20,14 @@
     "dockerode": "^3.2.1",
     "next": "10.0.3",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-dom": "^16.14.0",
+    "ws": "^7.4.0"
   },
   "devDependencies": {
     "@types/dockerode": "^3.2.1",
     "@types/node": "^14.14.10",
     "@types/react": "^17.0.0",
+    "@types/ws": "^7.4.0",
     "@typescript-eslint/eslint-plugin": "^4.8.2",
     "@typescript-eslint/parser": "^4.8.2",
     "eslint": "^7.14.0",
