@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { dokkuClient } from '../../../../dokku/DokkuClient';
 
 export default async (
   req: NextApiRequest,
@@ -18,8 +19,16 @@ export default async (
   const {
     query: { app },
   } = req;
-  res.statusCode = 200;
-  res.json({
-    name: app,
-  });
+  try {
+    if (!Array.isArray(app)) {
+      const storage = await dokkuClient.getAppStorage(app);
+      // const appData = await dokkuClient.getAppData(app);
+      console.log('appData', storage);
+    }
+    res.status(200).json({
+      name: app,
+    });
+  } catch (e) {
+    res.status(500).end(e.message);
+  }
 };

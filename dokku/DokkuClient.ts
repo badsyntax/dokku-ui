@@ -33,6 +33,18 @@ export class DokkuClient extends IPCClient {
     const apps = response.output.split('\n');
     return apps;
   }
+
+  public async getAppData(app: string): Promise<string[]> {
+    const response = await this.runCommand(`report ${app}`);
+    const apps = response.output.split('\n');
+    return apps;
+  }
+
+  public async getAppStorage(app: string): Promise<string[]> {
+    const response = await this.runCommand(`storage:list ${app}`);
+    const volumes = response.output.split('\n');
+    return volumes;
+  }
 }
 
 export const dokkuClient = new DokkuClient(DOKKU_SOCKET_PATH);

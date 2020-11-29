@@ -26,6 +26,8 @@
   "cSpell.language": "en-GB",
   "cSpell.words": [
     "Dokku",
-    "dockerode"
+    "dockerode",
+    "mkdir",
+    "socat"
   ]
 }

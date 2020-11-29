@@ -5,6 +5,7 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> => {
+  console.log('get apps');
   const apps = await dokkuClient.getApps();
   res.statusCode = 200;
   res.json(apps);

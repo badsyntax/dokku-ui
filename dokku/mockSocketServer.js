@@ -14,11 +14,20 @@ net
     });
 
     stream.on('data', (msg) => {
-      const command = msg.toString('utf-8').replace(/--[a-z]+\s/g, '');
+      const command = msg
+        .toString('utf-8')
+        .replace(/--[a-z]+\s/g, '')
+        .split(' ')[0];
       console.log('Server: got command:', command);
       switch (command) {
         case 'apps:list':
           stream.write('{"ok":true,"output":"demo-app\nnew-app"}');
+        case 'storage:list':
+          stream.write('{"ok":true,"output":"demo-app\nnew-app"}');
+        default:
+          stream.write(
+            `{"ok":false,"output":"Command '${command}' not mocked"}`
+          );
       }
     });
   })
