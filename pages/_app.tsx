@@ -4,7 +4,7 @@ import Head from 'next/head';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../theme/theme';
-import { AppShell } from '../components/AppShell/AppShell';
+import { AppShell } from '../features/layout/AppShell/AppShell';
 
 export interface MyAppProps {
   Component: React.FunctionComponent | React.ComponentClass;

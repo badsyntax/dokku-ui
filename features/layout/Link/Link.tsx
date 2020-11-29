@@ -15,6 +15,7 @@ const NextComposed = React.forwardRef<
   > &
     React.PropsWithChildren<LinkProps>
 >(function NextComposed(props, ref) {
+  /* eslint-disable jsx-a11y/anchor-has-content */
   const { as, href, ...other } = props;
   return (
     <NextLink href={href} as={as}>
@@ -22,6 +23,10 @@ const NextComposed = React.forwardRef<
     </NextLink>
   );
 });
+
+function rootPathSegment(url: string): string {
+  return url.split('/')[1];
+}
 
 type StyledLinkProps = MuiLinkProps & {
   activeClassName?: string;
@@ -41,7 +46,9 @@ const StyledLink: React.FunctionComponent<StyledLinkProps> = ({
   const router = useRouter();
   const pathname = href;
   const className = clsx(classNameProps, {
-    [activeClassName]: router.pathname === pathname && activeClassName,
+    [activeClassName]:
+      rootPathSegment(router.pathname) === rootPathSegment(pathname) &&
+      activeClassName,
   });
 
   if (naked) {

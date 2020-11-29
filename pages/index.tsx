@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Typography } from '@material-ui/core';
-import { PageHeader } from '../components/PageHeader/PageHeader';
+import { PageHeader } from '../features/layout/PageHeader/PageHeader';
 
 const Home: React.FunctionComponent = () => {
   return (
