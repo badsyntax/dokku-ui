@@ -35,3 +35,4 @@ yarn-error.log*
 
 # compiled server files
 server/**/*.js
+ws/**/*.js
