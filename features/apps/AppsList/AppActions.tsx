@@ -1,6 +1,7 @@
 import { Menu, MenuItem } from '@material-ui/core';
 import React, { Fragment, useState } from 'react';
 import { ConfirmationDialog } from '../../layout/ConfirmationDialog/ConfirmationDialog';
+import { CreateAppDialog } from '../CreateAppDialog/CreateAppDialog';
 
 export enum Actions {
   destroy,
@@ -52,6 +53,15 @@ export const AppActions: React.FunctionComponent<AppActionsProps> = ({
         keepMounted
         open={Boolean(anchorEl)}
         onClose={resetAction}
+        getContentAnchorEl={null}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
       >
         {menuItems.map((item) => (
           <MenuItem

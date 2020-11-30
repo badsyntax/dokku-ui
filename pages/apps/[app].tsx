@@ -1,5 +1,5 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { Button, CircularProgress } from '@material-ui/core';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import { PageHeader } from '../../features/layout/PageHeader/PageHeader';
 import { App } from '../../dokku/types';
@@ -7,11 +7,17 @@ import { AppDetail } from '../../features/apps/AppDetail/AppDetail';
 import { DokkuClientError } from '../../features/layout/DokkuClientError/DokkuClientError';
 import { WsServerMessage } from '../../api/types';
 import { ContainerStats } from 'dockerode';
+import { AppDetailPageActions } from '../../features/apps/AppDetailPageActions/AppDetailPageActions';
+import { ProgressContext } from '../../features/layout/Progress/Progress';
 
 const Apps: React.FunctionComponent = () => {
   const [app, setApp] = useState<App>(null);
   const [error, setError] = useState<Error>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const {
+    isVisible: isLoading,
+    show: showProgress,
+    hide: hideProgress,
+  } = useContext(ProgressContext);
   const router = useRouter();
   const { app: appName } = router.query;
 
@@ -22,7 +28,7 @@ const Apps: React.FunctionComponent = () => {
       if (!appName || Array.isArray(appName)) {
         return;
       }
-      setIsLoading(true);
+      showProgress();
       const { streamingAPI } = await import(
         /* webpackChunkName: 'StreamingApi' */ '../../api/SteamingAPI'
       );
@@ -35,16 +41,13 @@ const Apps: React.FunctionComponent = () => {
       const { dokkuApi } = await import(
         /* webpackChunkName: 'DokkuAPI' */ '../../api/DokkuAPI'
       );
-      dokkuApi
-        .getApp(appName)
-        .then(setApp, setError)
-        .finally(() => setIsLoading(false));
+      dokkuApi.getApp(appName).then(setApp, setError).finally(hideProgress);
     }
     fetchData();
     return () => {
       // FIXME: kill the stream
     };
-  }, [appName]);
+  }, [appName, hideProgress, showProgress]);
 
   return (
     <Fragment>
@@ -54,9 +57,11 @@ const Apps: React.FunctionComponent = () => {
           title: 'Apps',
           url: '/apps',
         }}
-        pageActions={[<Button variant="contained">Actions</Button>]}
+        pageActions={
+          !isLoading && app && <AppDetailPageActions app={app.name} />
+        }
       />
-      {isLoading && <CircularProgress />}
+      {isLoading && <Typography>Loading...</Typography>}
       {!isLoading && app && <AppDetail app={app} />}
       {!isLoading && error && <DokkuClientError error={error} />}
     </Fragment>

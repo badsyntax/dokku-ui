@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { dockerClient } from '../../../../docker/DockerClient';
+import { Images } from '../../../../docker/types';
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<Images>
 ): Promise<void> => {
   const [danglingImages, nonDanglingImages] = await Promise.all([
     dockerClient.listImages({

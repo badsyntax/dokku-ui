@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Box, Breadcrumbs, Button, Typography } from '@material-ui/core';
+import { Box, Breadcrumbs, Typography } from '@material-ui/core';
 import Head from 'next/head';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import Link from '../Link/Link';
@@ -16,13 +16,13 @@ export interface PageHeaderProps {
     title: string;
     url: string;
   };
-  pageActions?: React.ReactNode[];
+  pageActions?: React.ReactNode;
 }
 
 export const PageHeader: React.FunctionComponent<PageHeaderProps> = ({
   title,
   section,
-  pageActions = [],
+  pageActions,
 }) => {
   const classes = useStyles();
   return (
@@ -30,7 +30,7 @@ export const PageHeader: React.FunctionComponent<PageHeaderProps> = ({
       <Head>
         <title>Dokku UI - {title}</title>
       </Head>
-      <Box mb={4} className={classes.root}>
+      <Box mb={3} className={classes.root}>
         <Breadcrumbs
           aria-label="breadcrumb"
           separator={<NavigateNextIcon fontSize="default" />}
@@ -42,11 +42,7 @@ export const PageHeader: React.FunctionComponent<PageHeaderProps> = ({
           )}
           <Typography variant="h5">{title}</Typography>
         </Breadcrumbs>
-        <Box>
-          {pageActions.map((pageAction, i) => (
-            <Fragment key={i}>{pageAction}</Fragment>
-          ))}
-        </Box>
+        {pageActions || null}
       </Box>
     </Fragment>
   );

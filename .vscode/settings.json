@@ -28,6 +28,7 @@
     "Dokku",
     "dockerode",
     "mkdir",
-    "socat"
+    "socat",
+    "vhosts"
   ]
 }

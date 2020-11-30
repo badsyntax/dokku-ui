@@ -3,9 +3,11 @@ export class HttpAPI {
 
   protected makeRequest<ResponseType>(
     url: string,
-    accept: 'application/json' | 'text/html'
+    accept: 'application/json' | 'text/html',
+    method = 'get'
   ): Promise<ResponseType> {
     return fetch(`${this.basePath}/${url}`, {
+      method,
       headers: {
         Accept: accept,
       },

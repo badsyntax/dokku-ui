@@ -1,39 +1,29 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { Button, CircularProgress } from '@material-ui/core';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { Typography } from '@material-ui/core';
 import { PageHeader } from '../../features/layout/PageHeader/PageHeader';
 import { dokkuApi } from '../../api/DokkuAPI';
 import { AppsList } from '../../features/apps/AppsList/AppsList';
 import { DokkuClientError } from '../../features/layout/DokkuClientError/DokkuClientError';
-import AddIcon from '@material-ui/icons/Add';
+import { AppListPageActions } from '../../features/apps/AppListPageActions/AppListPageActions';
+import { ProgressContext } from '../../features/layout/Progress/Progress';
 
 const Apps: React.FunctionComponent = () => {
   const [apps, setApps] = useState<string[]>([]);
   const [error, setError] = useState<Error>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const createApp = () => {
-    alert('create app');
-  };
+  const {
+    isVisible: isLoading,
+    show: showProgress,
+    hide: hideProgress,
+  } = useContext(ProgressContext);
+
   useEffect(() => {
-    dokkuApi
-      .getApps()
-      .then(setApps, setError)
-      .finally(() => setIsLoading(false));
-  }, []);
+    showProgress();
+    dokkuApi.getApps().then(setApps, setError).finally(hideProgress);
+  }, [hideProgress, showProgress]);
   return (
     <Fragment>
-      <PageHeader
-        title="Apps"
-        pageActions={[
-          <Button
-            variant="contained"
-            onClick={createApp}
-            startIcon={<AddIcon />}
-          >
-            Create App
-          </Button>,
-        ]}
-      />
-      {isLoading && <CircularProgress />}
+      <PageHeader title="Apps" pageActions={<AppListPageActions />} />
+      {isLoading && <Typography>Loading...</Typography>}
       {!isLoading && !error && <AppsList apps={apps} />}
       {!isLoading && error && <DokkuClientError error={error} />}
     </Fragment>
