@@ -30,7 +30,7 @@ const Apps: React.FunctionComponent = () => {
       }
       showProgress();
       const { streamingAPI } = await import(
-        /* webpackChunkName: 'StreamingApi' */ '../../api/SteamingAPI'
+        /* webpackChunkName: 'StreamingApi' */ '../../api/StreamingAPI'
       );
       const unsubscribe = streamingAPI.getAppData(
         appName,
@@ -57,13 +57,10 @@ const Apps: React.FunctionComponent = () => {
           title: 'Apps',
           url: '/apps',
         }}
-        pageActions={
-          !isLoading && app && <AppDetailPageActions app={app.name} />
-        }
+        pageActions={app && <AppDetailPageActions app={app.name} />}
       />
-      {isLoading && <Typography>Loading...</Typography>}
-      {!isLoading && app && <AppDetail app={app} />}
-      {!isLoading && error && <DokkuClientError error={error} />}
+      {app && <AppDetail app={app} />}
+      {error && <DokkuClientError error={error} />}
     </Fragment>
   );
 };

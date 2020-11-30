@@ -30,7 +30,7 @@ export default async (
     const storage = await dokkuClient.getAppStorage(app);
     const domains = await dokkuClient.getAppDomains(app);
     const network = await dokkuClient.getAppNetwork(app);
-    const proxyPorts = await dokkuClient.getAppProxyPorts(app);
+    // const proxyPorts = await dokkuClient.getAppProxyPorts(app);
     const proxyInfo = await dokkuClient.getAppProxyInfo(app);
     const processInfo = await dokkuClient.getAppProcessInfo(app);
     res.status(200).json({
@@ -38,7 +38,7 @@ export default async (
       storage,
       domains,
       network,
-      proxyPorts,
+      proxyPorts: [],
       proxyInfo,
       processInfo,
     });

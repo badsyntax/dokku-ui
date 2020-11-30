@@ -1,5 +1,6 @@
 import { DOKKU_SOCKET_PATH } from '../constants/constants';
 import { IPCClient } from './IPCClient';
+import { TCPClient } from './TCPClient';
 import {
   AppStorageVolume,
   AppDomains,
@@ -13,16 +14,17 @@ interface DokkuResponse {
   output: string;
 }
 
-export class DokkuClient extends IPCClient {
+export class DokkuClient {
+  constructor(private readonly client: TCPClient | IPCClient) {}
+
   public async runCommand(command: string): Promise<DokkuResponse> {
-    return this.waitForReady().then(
+    return this.client.waitForReady().then(
       () =>
         new Promise((resolve, reject) => {
-          function handleData(data) {
+          function handleData(buffer) {
+            const data = buffer.toString('utf-8').trim().replace(/\n/g, '\\n');
             try {
-              const response = JSON.parse(
-                data.toString('utf-8').replace(/\n/g, '\\n')
-              );
+              const response = JSON.parse(data);
               if (!response.ok) {
                 throw new Error(response.output || `Error running ${command}`);
               } else {
@@ -32,8 +34,8 @@ export class DokkuClient extends IPCClient {
               reject(e);
             }
           }
-          this.socket.once('data', handleData);
-          this.socket.write(`--quiet ${command}`);
+          this.client.socket.once('data', handleData);
+          this.client.socket.write(`--quiet ${command}\n`);
         })
     );
   }
@@ -187,4 +189,5 @@ export class DokkuClient extends IPCClient {
   }
 }
 
-export const dokkuClient = new DokkuClient(DOKKU_SOCKET_PATH);
+const client = new IPCClient(DOKKU_SOCKET_PATH);
+export const dokkuClient = new DokkuClient(client);

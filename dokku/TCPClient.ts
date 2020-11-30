@@ -1,20 +1,21 @@
 import net from 'net';
 
-export class IPCClient {
+export class TCPClient {
   public isReady = false;
   public socket: net.Socket;
 
-  constructor(private readonly socketPath: string) {
+  constructor(private readonly port: number, private readonly host: string) {
     this.connect();
   }
 
   private connect(): void {
-    console.log('IPCClient', `Connecting to ${this.socketPath}`);
-    this.socket = net
-      .createConnection(this.socketPath)
+    console.log('TCPClient', `Connecting to ${this.host}:${this.port}`);
+    this.socket = new net.Socket()
+      .connect(this.port, this.host)
+      .on('error', this.handleError)
       .on('connect', this.handleConnect)
       .on('end', this.handleEnd)
-      .on('error', this.handleError);
+      .on('close', this.handleEnd);
   }
 
   private handleConnect = (): void => {
@@ -22,7 +23,7 @@ export class IPCClient {
   };
 
   private handleError = (data): void => {
-    console.error('IPCClient', data);
+    console.error('TCPClient', data);
   };
 
   private handleEnd = (): void => {

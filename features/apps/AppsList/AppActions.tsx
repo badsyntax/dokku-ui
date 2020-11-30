@@ -1,4 +1,4 @@
-import { Menu, MenuItem } from '@material-ui/core';
+import { Menu, MenuItem, MenuProps } from '@material-ui/core';
 import React, { Fragment, useState } from 'react';
 import { ConfirmationDialog } from '../../layout/ConfirmationDialog/ConfirmationDialog';
 import { CreateAppDialog } from '../CreateAppDialog/CreateAppDialog';
@@ -23,11 +23,9 @@ const menuItems = [
   { name: 'Destroy', action: Actions.destroy },
 ];
 
-export const AppActions: React.FunctionComponent<AppActionsProps> = ({
-  app,
-  anchorEl,
-  resetAnchorEl,
-}) => {
+export const AppActions: React.FunctionComponent<
+  AppActionsProps & MenuProps
+> = ({ app, anchorEl, resetAnchorEl, ...rest }) => {
   const [action, setAction] = useState<Actions>(null);
 
   const handleActionsMenuItemClick = (action: Actions) => () => {
@@ -47,6 +45,13 @@ export const AppActions: React.FunctionComponent<AppActionsProps> = ({
 
   return (
     <Fragment>
+      <ConfirmationDialog
+        title="Please Confirm"
+        message={`Are you sure you want to destroy the app '${app}'?`}
+        open={action === Actions.destroy}
+        onClose={resetAction}
+        onConfirm={destroyApp}
+      />
       <Menu
         id="simple-menu"
         anchorEl={anchorEl}
@@ -54,14 +59,7 @@ export const AppActions: React.FunctionComponent<AppActionsProps> = ({
         open={Boolean(anchorEl)}
         onClose={resetAction}
         getContentAnchorEl={null}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
+        {...rest}
       >
         {menuItems.map((item) => (
           <MenuItem
@@ -72,13 +70,6 @@ export const AppActions: React.FunctionComponent<AppActionsProps> = ({
           </MenuItem>
         ))}
       </Menu>
-      <ConfirmationDialog
-        title="Please Confirm"
-        message={`Are you sure you want to destroy the app '${app}'?`}
-        open={action === Actions.destroy}
-        onClose={resetAction}
-        onConfirm={destroyApp}
-      />
     </Fragment>
   );
 };

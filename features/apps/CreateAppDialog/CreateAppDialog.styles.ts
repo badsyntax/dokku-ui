@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 export const useStyles = makeStyles((theme) => ({
   content: {
-    width: 400,
+    width: 460,
   },
   closeButton: {
     position: 'absolute',

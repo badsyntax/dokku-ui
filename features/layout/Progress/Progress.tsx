@@ -1,6 +1,16 @@
-import React, { useCallback, useContext, useState } from 'react';
-import { LinearProgress } from '@material-ui/core';
-import { useStyles } from './Progress.styles';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import TopBarProgress from 'react-topbar-progress-indicator';
+import { theme } from '../../../theme/theme';
+
+TopBarProgress.config({
+  barColors: {
+    0: theme.palette.secondary.main,
+    '1.0': theme.palette.secondary.main,
+  },
+  shadowBlur: 5,
+  shadowColor: 'rgba(0,0,0,0.5)',
+  barThickness: 4,
+});
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = (): void => {};
@@ -22,7 +32,7 @@ export const ProgressContext = React.createContext<ProgressContext>(
 );
 
 export const ProgressProvider: React.FunctionComponent = ({ children }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(initialState.isVisible);
   const show = useCallback(() => setIsVisible(true), []);
   const hide = useCallback(() => setIsVisible(false), []);
   return (
@@ -34,6 +44,8 @@ export const ProgressProvider: React.FunctionComponent = ({ children }) => {
 
 export const Progress: React.FunctionComponent = () => {
   const { isVisible } = useContext(ProgressContext);
-  const classes = useStyles();
-  return isVisible && <LinearProgress className={classes.root} />;
+  useEffect(() => {
+    document.body.style.cursor = isVisible ? 'progress' : 'default';
+  }, [isVisible]);
+  return isVisible ? <TopBarProgress /> : null;
 };

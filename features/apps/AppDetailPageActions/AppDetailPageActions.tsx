@@ -25,7 +25,20 @@ export const AppDetailPageActions: React.FunctionComponent<AppDetailPageActionsP
 
   return (
     <Box className={classes.root}>
-      <AppActions anchorEl={anchorEl} app={app} resetAnchorEl={resetAnchorEl} />
+      <AppActions
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        app={app}
+        resetAnchorEl={resetAnchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      />
       <Button variant="outlined" startIcon={<StopIcon />}>
         Stop
       </Button>

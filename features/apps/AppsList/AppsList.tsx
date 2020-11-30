@@ -36,6 +36,7 @@ export const AppsList: React.FunctionComponent<AppsListProps> = ({ apps }) => {
   return (
     <TableContainer component={Paper}>
       <AppActions
+        open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         app={selectedApp}
         resetAnchorEl={resetAnchorEl}

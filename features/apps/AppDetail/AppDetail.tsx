@@ -2,7 +2,16 @@ import React, { useState } from 'react';
 import {
   AppBar,
   Box,
+  Button,
+  Checkbox,
+  Divider,
+  FormControlLabel,
   Grid,
+  Link,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Paper,
   Tab,
   Tabs,
@@ -11,6 +20,11 @@ import {
 import { App } from '../../../dokku/types';
 import { useStyles } from './AppDetail.styles';
 import { Alert } from '@material-ui/lab';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import BlockIcon from '@material-ui/icons/Block';
+import HttpIcon from '@material-ui/icons/Http';
+import LanguageIcon from '@material-ui/icons/Language';
+import AddIcon from '@material-ui/icons/Add';
 
 export interface AppDetailProps {
   app: App;
@@ -96,6 +110,7 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
             scrollButtons="auto"
           >
             <Tab label="Storage Volumes" {...a11yProps(0)} />
+            <Tab label="Environment" {...a11yProps(0)} />
             <Tab label="Domains" {...a11yProps(1)} />
             <Tab label="Proxy" {...a11yProps(2)} />
             <Tab label="Network" {...a11yProps(2)} />
@@ -116,36 +131,58 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
             </ul>
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <Grid className={classes.grid} container spacing={3}>
+            <Grid container spacing={3}>
               <Grid item xs={6}>
                 <Typography variant="h6">Virtual Hosts</Typography>
-                <Typography>
+                {/* <Typography>
                   Enabled: {app.domains.enabled.toString()}
-                </Typography>
-                <ul>
+                </Typography> */}
+                <List component="nav">
                   {app.domains.vhosts.map((vhost) => {
                     return (
-                      <li key={vhost}>
-                        <Typography>{vhost}</Typography>
-                      </li>
+                      <ListItem button component={Link} href={vhost}>
+                        <ListItemIcon>
+                          <LanguageIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={vhost} />
+                      </ListItem>
                     );
                   })}
-                </ul>
+                </List>
+                <Button variant="outlined" startIcon={<AddIcon />}>
+                  Add host
+                </Button>{' '}
+                {app.domains.enabled && (
+                  <Button variant="outlined" startIcon={<BlockIcon />}>
+                    Disable
+                  </Button>
+                )}
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="h6">Global Virtual Hosts</Typography>
-                <Typography>
+                {/* <Typography>
                   Enabled: {app.domains.globalEnabled.toString()}
-                </Typography>
-                <ul>
+                </Typography> */}
+                <List component="nav">
                   {app.domains.globalVhosts.map((vhost) => {
                     return (
-                      <li key={vhost}>
-                        <Typography>{vhost}</Typography>
-                      </li>
+                      <ListItem button component={Link} href={vhost}>
+                        <ListItemIcon>
+                          <LanguageIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={vhost} />
+                      </ListItem>
                     );
                   })}
-                </ul>
+                </List>
+                <Button variant="outlined" startIcon={<AddIcon />}>
+                  Add host
+                </Button>{' '}
+                {app.domains.globalEnabled && (
+                  <Button variant="outlined" startIcon={<BlockIcon />}>
+                    Disable
+                  </Button>
+                )}
               </Grid>
             </Grid>
           </TabPanel>

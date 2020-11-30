@@ -48,7 +48,6 @@ net
           const response = `{"ok":true,"output":${JSON.stringify(
             JSON.stringify(JSON.parse(output))
           )}}`;
-          console.log('response', response);
           stream.write(response);
           break;
         }

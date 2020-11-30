@@ -1,30 +1,30 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { CircularProgress } from '@material-ui/core';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { PageHeader } from '../../features/layout/PageHeader/PageHeader';
 import { dockerAPI, GetImagesResponse } from '../../api/DockerAPI';
 import { ImagesList } from '../../features/images/ImagesList/ImagesList';
+import { ProgressContext } from '../../features/layout/Progress/Progress';
+import { DokkuClientError } from '../../features/layout/DokkuClientError/DokkuClientError';
 
 const Images: React.FunctionComponent = () => {
   const [images, setImages] = useState<GetImagesResponse>(null);
   const [error, setError] = useState<Error>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { show: showProgress, hide: hideProgress } = useContext(
+    ProgressContext
+  );
   useEffect(() => {
-    dockerAPI
-      .getImages()
-      .then(setImages, setError)
-      .finally(() => setIsLoading(false));
-  }, []);
+    showProgress();
+    dockerAPI.getImages().then(setImages, setError).finally(hideProgress);
+  }, [hideProgress, showProgress]);
   return (
     <Fragment>
       <PageHeader title="Images" />
-      {isLoading && <CircularProgress />}
-      {!isLoading && !error && (
+      {images && (
         <ImagesList
           images={images.nonDangling}
           danglingImages={images.dangling}
         />
       )}
-      {/* {!isLoading && error && <DokkuClientError error={error} />} */}
+      {error && <DokkuClientError error={error} />}
     </Fragment>
   );
 };

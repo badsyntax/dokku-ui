@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "npm run compile",
-    "prestart": "npm run compile",
-    "prestart:mock-dokku": "npm run compile",
-    "compile": "tsc --project tsconfig.server.json",
-    "dev": "node server",
-    "build": "next build",
-    "start": "NODE_ENV=production node server",
-    "start:mock-dokku": "rm -f /tmp/dokku-daemon.sock && cd dokku && node mockSocketServer"
+    "build:server": "tsc --project tsconfig.server.json",
+    "build": "npm run build:server && next build",
+    "start": "node server",
+    "dev": "npm run build:server && node server",
+    "start:mock-dokku": "npm run build:server && rm -f /tmp/dokku-daemon.sock && cd dokku && node mockSocketServer"
+  },
+  "resolutions": {
+    "minipass": "2.7.0"
   },
   "dependencies": {
     "@emotion/cache": "^11.0.0",
@@ -23,7 +23,8 @@
     "next": "10.0.3",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "sharp": "^0.26.2",
+    "react-topbar-progress-indicator": "^4.1.0",
+    "sharp": "^0.26.3",
     "ws": "^7.4.0"
   },
   "devDependencies": {

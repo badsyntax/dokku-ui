@@ -58,7 +58,10 @@ const initWsRouter = (server: WebSocket.Server) => (
 };
 
 export const initWebSocketServer = (): void => {
-  const wsServer = new WebSocket.Server({ port: WS_SERVER_PORT });
+  const host = 'localhost';
+  const wsServer = new WebSocket.Server({ port: WS_SERVER_PORT, host });
   wsServer.on('connection', initWsRouter(wsServer));
-  console.log(`> WebSocket server started on ws://localhost:${WS_SERVER_PORT}`);
+  console.log('typeof port', typeof WS_SERVER_PORT);
+  console.log('port', WS_SERVER_PORT);
+  console.log(`> WebSocket server started on ws://${host}:${WS_SERVER_PORT}`);
 };
