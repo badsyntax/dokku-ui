@@ -5,8 +5,6 @@ import { initWebSocketServer } from './webSocketServer';
 
 initWebSocketServer();
 
-console.log('> Preparing app...');
-
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const requestHandler = app.getRequestHandler();

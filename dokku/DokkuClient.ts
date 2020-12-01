@@ -7,11 +7,27 @@ import {
   AppNetwork,
   AppProxyPort,
   AppProxyInfo,
+  AppProcessReport,
 } from './types';
 
 interface DokkuResponse {
   ok: boolean;
   output: string;
+}
+
+function mergeData<T>(
+  obj: T,
+  line: string,
+  keyMapping: Record<string, string>,
+  getValue: (key, value) => unknown
+): T {
+  const [key, ...rest] = line.trim().split(':');
+  const value = rest.join(':');
+  const shortKey = keyMapping[key.trim()];
+  return {
+    ...obj,
+    [shortKey]: getValue(shortKey, value.trim()),
+  };
 }
 
 export class DokkuClient {
@@ -31,7 +47,7 @@ export class DokkuClient {
                 resolve(response);
               }
             } catch (e) {
-              reject(e);
+              reject(new Error('WITH DATA:' + data + ' ' + e.message));
             }
           }
           this.client.socket.once('data', handleData);
@@ -78,22 +94,23 @@ export class DokkuClient {
       }
     };
     const response = await this.runCommand(`domains:report ${app}`);
-    return response.output.split('\n').reduce<AppDomains>(
-      (previousValue, currentValue) => {
-        const [key, value] = currentValue.split(':');
-        const shortKey = keyMapping[key.trim()];
-        return {
-          ...previousValue,
-          [shortKey]: getValue(shortKey, value.trim()),
-        };
-      },
-      {
-        enabled: false,
-        vhosts: [],
-        globalEnabled: false,
-        globalVhosts: [],
-      }
-    );
+    return response.output
+      .split('\n')
+      .reduce<AppDomains>(
+        (previousValue, currentValue) =>
+          mergeData<AppDomains>(
+            previousValue,
+            currentValue,
+            keyMapping,
+            getValue
+          ),
+        {
+          enabled: false,
+          vhosts: [],
+          globalEnabled: false,
+          globalVhosts: [],
+        }
+      );
   }
 
   public async getAppNetwork(app: string): Promise<AppNetwork> {
@@ -114,23 +131,23 @@ export class DokkuClient {
       }
     };
     const response = await this.runCommand(`network:report ${app}`);
-    return response.output.split('\n').reduce<AppNetwork>(
-      (previousValue, currentValue) => {
-        const [key, ...rest] = currentValue.trim().split(':');
-        const value = rest.join(':');
-        const shortKey = keyMapping[key.trim()];
-        return {
-          ...previousValue,
-          [shortKey]: getValue(shortKey, value.trim()),
-        };
-      },
-      {
-        attachPostCreate: '',
-        attachPostDeploy: '',
-        bindAllInterfaces: false,
-        webListeners: [],
-      }
-    );
+    return response.output
+      .split('\n')
+      .reduce<AppNetwork>(
+        (previousValue, currentValue) =>
+          mergeData<AppNetwork>(
+            previousValue,
+            currentValue,
+            keyMapping,
+            getValue
+          ),
+        {
+          attachPostCreate: '',
+          attachPostDeploy: '',
+          bindAllInterfaces: false,
+          webListeners: [],
+        }
+      );
   }
 
   public async getAppProxyPorts(app: string): Promise<AppProxyPort[]> {
@@ -165,27 +182,72 @@ export class DokkuClient {
       }
     };
     const response = await this.runCommand(`proxy:report ${app}`);
-    return response.output.split('\n').reduce<AppProxyInfo>(
-      (previousValue, currentValue) => {
-        const [key, ...rest] = currentValue.trim().split(':');
-        const value = rest.join(':');
-        const shortKey = keyMapping[key.trim()];
-        return {
-          ...previousValue,
-          [shortKey]: getValue(shortKey, value.trim()),
-        };
-      },
-      {
-        enabled: false,
-        portMap: [],
-        type: '',
-      }
-    );
+    return response.output
+      .split('\n')
+      .reduce<AppProxyInfo>(
+        (previousValue, currentValue) =>
+          mergeData<AppProxyInfo>(
+            previousValue,
+            currentValue,
+            keyMapping,
+            getValue
+          ),
+        {
+          enabled: false,
+          portMap: [],
+          type: '',
+        }
+      );
   }
 
   public async getAppProcessInfo(app: string): Promise<any> {
     const response = await this.runCommand(`ps:inspect ${app}`);
     return JSON.parse(response.output);
+  }
+
+  public async getAppProcessReport(app: string): Promise<AppProcessReport> {
+    const keyMapping = {
+      Deployed: 'deployed',
+      Processes: 'processes',
+      'Ps can scale': 'psCanScale',
+      'Ps restart policy': 'psRestartPolicy',
+      Restore: 'restore',
+      Running: 'running',
+    };
+    const getValue = (key, value) => {
+      switch (key) {
+        case 'deployed':
+        case 'psCanScale':
+        case 'restore':
+        case 'running':
+          return value.toLowerCase() === 'true';
+        case 'processes':
+          return Number(value);
+        default:
+          return value;
+      }
+    };
+
+    const response = await this.runCommand(`ps:report ${app}`);
+    return response.output
+      .split('\n')
+      .reduce<AppProcessReport>(
+        (previousValue, currentValue) =>
+          mergeData<AppProcessReport>(
+            previousValue,
+            currentValue,
+            keyMapping,
+            getValue
+          ),
+        {
+          deployed: false,
+          processes: 0,
+          psCanScale: false,
+          psRestartPolicy: null,
+          restore: false,
+          running: false,
+        }
+      );
   }
 }
 

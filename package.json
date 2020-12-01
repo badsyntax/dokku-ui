@@ -6,7 +6,7 @@
     "build:server": "tsc --project tsconfig.server.json",
     "build": "npm run build:server && next build",
     "start": "node server",
-    "dev": "npm run build:server && node server",
+    "dev": "npm run build:server && npm start",
     "start:mock-dokku": "npm run build:server && rm -f /tmp/dokku-daemon.sock && cd dokku && node mockSocketServer"
   },
   "resolutions": {

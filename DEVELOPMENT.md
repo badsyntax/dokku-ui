@@ -1,47 +1,61 @@
 # How to develop this app
 
-There's two main workflows:
+## Running the app
 
-- Develop the app on the host using mock dokku and docker servers
-- Publish and run the app in a VirtualBox VM
-
-## Getting started
-
-Run the app in development mode:
+Run the app in development mode (`docker` and `dokku` are mocked):
 
 ```sh
 nvm use
 npm i
+npm run build:server
 
 # In terminal 1
 npm run start:mock-dokku
 
 # In terminal 2
-npm run dev
+npm start
 ```
 
-## Running in the dokku VM
+Visit http://localhost:3000 to view the running app.
 
-> Due to performance issues with synced folders we can't share node_modules between host and container. For this reason it's not practical to do development within the container if using an IDE.
+## Running in a dokku VM
 
-The following describes the process to deploy dokku-ui to a Ubuntu VM.
+Running the app in the VM means we don't need to mock `dokku` or `docker`.
 
-Clone the dokku repo:
+### Setting up the VM
+
+Clone the `dokku` repo:
 
 ```sh
 git clone https://github.com/dokku/dokku
+cd dokku
 ```
 
-Start the dokku VM using vagrant:
+Update the `Vagrantfile` to use `rsync` for synced folders (this allows app server to reload when files change):
+
+Replace:
+
+`vm.vm.synced_folder File.dirname(__FILE__), "/root/dokku"`
+
+with:
+
+`vm.vm.synced_folder File.dirname(__FILE__), "/root/dokku", type: "rsync", rsync_auto: true, rsync_exclude: ".git/"`
+
+Start the `dokku` VM using `vagrant`:
 
 ```sh
-cd dokku
 vagrant up dokku
 ```
 
 Visit http://dokku.me to complete the installation.
 
-Install & start the dokku-daemon:
+Start `rsync-auto` in a different terminal to sync file changes:
+
+```sh
+vagrant rsync-auto
+```
+
+Install & start the `dokku-daemon`:
 
 ```sh
 vagrant ssh
@@ -52,16 +66,47 @@ sudo make install
 sudo systemctl start dokku-daemon
 ```
 
-## Adding mocks
+### Running in the dokku VM
 
-Interact with the daemon to save mock responses to the mock dokku server:
+Copy the `dokku-ui` directory into the root of the `dokku` repo and enter the VM:
+
+```sh
+cp -r dokku-ui ../dokku/
+```
+
+Install deps in the VM:
 
 ```sh
 vagrant ssh
-socat - UNIX-CONNECT:/var/run/dokku-daemon/dokku-daemon.sock
+cd /vagrant/dokku-ui
+rm -rf node_modules package-lock.json
+npm i
 ```
 
-## Deploying to the dokku VM
+As the `node_modules` folder is synced to the host, this process can take a long time and is known to freeze. To workaround this performance issue:
+
+1. Move the `dokku-ui` directory into a different directory within the VM
+2. Install the node modules (`npm i`)
+3. Move the `dokku-ui` directory back into `/vagrant`
+4. You might need to run `npm rebuild --verbose sharp` to fix any symlink issues
+
+Update vagrant user permissions to allow nodejs to access sockets:
+
+```sh
+sudo usermod -aG docker vagrant
+sudo usermod -aG dokku vagrant
+```
+
+Now you can build and start the app within the VM:
+
+```sh
+npm run build:server
+npm start
+```
+
+Visit http://dokku.me:3000 to view the running app.
+
+### Deploying to the dokku VM
 
 Create the dokku-ui app:
 
@@ -80,4 +125,13 @@ Add the git remote and push to deploy:
 ```sh
 git remote add dokku dokku@dokku.me:dokku-ui
 git push dokku
+```
+
+## Adding mocks
+
+Interact with the daemon to save mock responses to the mock `dokku` server:
+
+```sh
+vagrant ssh
+socat - UNIX-CONNECT:/var/run/dokku-daemon/dokku-daemon.sock
 ```

@@ -7,6 +7,7 @@ export default async (
   res: NextApiResponse<App>
 ): Promise<void> => {
   // dokku ps:inspect gr20-discourse
+  // dokku ps:report gr20-discourse
   // dokku logs gr20-discourse
   // dokku domains:report app
   // dokku network:report gr20-discourse
@@ -32,7 +33,8 @@ export default async (
     const network = await dokkuClient.getAppNetwork(app);
     // const proxyPorts = await dokkuClient.getAppProxyPorts(app);
     const proxyInfo = await dokkuClient.getAppProxyInfo(app);
-    const processInfo = await dokkuClient.getAppProcessInfo(app);
+    const processReport = await dokkuClient.getAppProcessReport(app);
+    // const processInfo = await dokkuClient.getAppProcessInfo(app);
     res.status(200).json({
       name: app,
       storage,
@@ -40,7 +42,8 @@ export default async (
       network,
       proxyPorts: [],
       proxyInfo,
-      processInfo,
+      processInfo: {},
+      processReport,
     });
   } catch (e) {
     console.error(e);

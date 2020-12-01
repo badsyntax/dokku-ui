@@ -29,6 +29,15 @@ export interface AppProxyInfo {
   type: string;
 }
 
+export interface AppProcessReport {
+  deployed: boolean;
+  processes: number;
+  psCanScale: boolean;
+  psRestartPolicy: string;
+  restore: boolean;
+  running: boolean;
+}
+
 export interface App {
   name: string;
   storage: AppStorageVolume[];
@@ -37,4 +46,5 @@ export interface App {
   proxyPorts: AppProxyPort[];
   proxyInfo: AppProxyInfo;
   processInfo: unknown;
+  processReport: AppProcessReport;
 }

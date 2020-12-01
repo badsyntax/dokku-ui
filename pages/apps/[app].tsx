@@ -1,5 +1,4 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
-import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import { PageHeader } from '../../features/layout/PageHeader/PageHeader';
 import { App } from '../../dokku/types';
@@ -9,6 +8,7 @@ import { WsServerMessage } from '../../api/types';
 import { ContainerStats } from 'dockerode';
 import { AppDetailPageActions } from '../../features/apps/AppDetailPageActions/AppDetailPageActions';
 import { ProgressContext } from '../../features/layout/Progress/Progress';
+import { ProgressMessage } from '../../features/layout/ProgressMessage/ProgressMessage';
 
 const Apps: React.FunctionComponent = () => {
   const [app, setApp] = useState<App>(null);
@@ -20,8 +20,6 @@ const Apps: React.FunctionComponent = () => {
   } = useContext(ProgressContext);
   const router = useRouter();
   const { app: appName } = router.query;
-
-  const pageTitle = error?.message || app?.name;
 
   useEffect(() => {
     async function fetchData() {
@@ -52,14 +50,15 @@ const Apps: React.FunctionComponent = () => {
   return (
     <Fragment>
       <PageHeader
-        title={pageTitle}
+        title={Array.isArray(appName) ? appName[0] : appName}
         section={{
           title: 'Apps',
           url: '/apps',
         }}
         pageActions={app && <AppDetailPageActions app={app.name} />}
       />
-      {app && <AppDetail app={app} />}
+      {isLoading && <ProgressMessage />}
+      {!isLoading && app && <AppDetail app={app} />}
       {error && <DokkuClientError error={error} />}
     </Fragment>
   );
