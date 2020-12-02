@@ -3,7 +3,13 @@ import { Button } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import { CreateAppDialog } from '../CreateAppDialog/CreateAppDialog';
 
-export const AppListPageActions: React.FunctionComponent = () => {
+export interface AppListPageActions {
+  onAppCreate: () => void;
+}
+
+export const AppListPageActions: React.FunctionComponent<AppListPageActions> = ({
+  onAppCreate,
+}) => {
   const [createAppDialogOpen, setCreateAppDialogOpen] = useState<boolean>(
     false
   );
@@ -18,6 +24,7 @@ export const AppListPageActions: React.FunctionComponent = () => {
       <CreateAppDialog
         open={createAppDialogOpen}
         onClose={handleCreateAppDialogClose}
+        onCreate={onAppCreate}
       />
       <Button
         variant="outlined"

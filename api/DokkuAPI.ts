@@ -1,16 +1,17 @@
 import { App } from '../dokku/types';
 import { HttpAPI } from './HttpAPI';
 
-export type AppsResponse = string[];
-export type AppResponse = App;
-
 export class DokkuAPI extends HttpAPI {
-  getApps(): Promise<AppsResponse> {
-    return this.getJson<AppsResponse>('apps');
+  getApps(): Promise<string[]> {
+    return this.getJson<string[]>('apps');
   }
 
-  getApp(appName: string): Promise<AppResponse> {
-    return this.getJson<AppResponse>(`apps/${appName}`);
+  getApp(app: string): Promise<App> {
+    return this.getJson<App>(`apps/${app}`);
+  }
+
+  createApp(app: string): Promise<any> {
+    return this.put<App>(`apps/${app}`);
   }
 }
 

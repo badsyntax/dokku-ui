@@ -30,6 +30,14 @@ function mergeData<T>(
   };
 }
 
+function getLines(output: string): string[] {
+  return output.trim().split('\n').filter(Boolean);
+}
+
+function parseLines<T>(response: DokkuResponse, lineParser: (line) => T): T[] {
+  return getLines(response.output).map(lineParser);
+}
+
 export class DokkuClient {
   constructor(private readonly client: TCPClient | IPCClient) {}
 
@@ -39,15 +47,17 @@ export class DokkuClient {
         new Promise((resolve, reject) => {
           function handleData(buffer) {
             const data = buffer.toString('utf-8').trim().replace(/\n/g, '\\n');
+            let response: any;
             try {
-              const response = JSON.parse(data);
-              if (!response.ok) {
-                throw new Error(response.output || `Error running ${command}`);
-              } else {
-                resolve(response);
-              }
+              response = JSON.parse(data);
             } catch (e) {
-              reject(new Error('WITH DATA:' + data + ' ' + e.message));
+              console.error('Error parsing data:', data);
+              reject(e);
+            }
+            if (!response.ok) {
+              reject(new Error(response.output || `Error running ${command}`));
+            } else {
+              resolve(response);
             }
           }
           this.client.socket.once('data', handleData);
@@ -68,7 +78,7 @@ export class DokkuClient {
 
   public async getAppStorage(app: string): Promise<AppStorageVolume[]> {
     const response = await this.runCommand(`storage:list ${app}`);
-    return response.output.split('\n').map((volume) => {
+    return parseLines<AppStorageVolume>(response, (volume) => {
       const [host, container] = volume.split(':');
       return { host, container };
     });
@@ -88,29 +98,28 @@ export class DokkuClient {
           return value.toLowerCase() === 'true';
         case 'vhosts':
         case 'globalVhosts':
-          return value.split(' ');
+          return value.split(' ').filter(Boolean);
         default:
           return value;
       }
     };
+
     const response = await this.runCommand(`domains:report ${app}`);
-    return response.output
-      .split('\n')
-      .reduce<AppDomains>(
-        (previousValue, currentValue) =>
-          mergeData<AppDomains>(
-            previousValue,
-            currentValue,
-            keyMapping,
-            getValue
-          ),
-        {
-          enabled: false,
-          vhosts: [],
-          globalEnabled: false,
-          globalVhosts: [],
-        }
-      );
+    return getLines(response.output).reduce<AppDomains>(
+      (previousValue, currentValue) =>
+        mergeData<AppDomains>(
+          previousValue,
+          currentValue,
+          keyMapping,
+          getValue
+        ),
+      {
+        enabled: false,
+        vhosts: [],
+        globalEnabled: false,
+        globalVhosts: [],
+      }
+    );
   }
 
   public async getAppNetwork(app: string): Promise<AppNetwork> {
@@ -125,38 +134,37 @@ export class DokkuClient {
         case 'bindAllInterfaces':
           return value.toLowerCase() === 'true';
         case 'webListeners':
-          return value.split(' ');
+          return value.split(' ').filter(Boolean);
         default:
           return value;
       }
     };
     const response = await this.runCommand(`network:report ${app}`);
-    return response.output
-      .split('\n')
-      .reduce<AppNetwork>(
-        (previousValue, currentValue) =>
-          mergeData<AppNetwork>(
-            previousValue,
-            currentValue,
-            keyMapping,
-            getValue
-          ),
-        {
-          attachPostCreate: '',
-          attachPostDeploy: '',
-          bindAllInterfaces: false,
-          webListeners: [],
-        }
-      );
+    return getLines(response.output).reduce<AppNetwork>(
+      (previousValue, currentValue) =>
+        mergeData<AppNetwork>(
+          previousValue,
+          currentValue,
+          keyMapping,
+          getValue
+        ),
+      {
+        attachPostCreate: '',
+        attachPostDeploy: '',
+        bindAllInterfaces: false,
+        webListeners: [],
+      }
+    );
   }
 
   public async getAppProxyPorts(app: string): Promise<AppProxyPort[]> {
     const response = await this.runCommand(`proxy:ports ${app}`);
-    return response.output.split('\n').map((ports) => {
+    return getLines(response.output).map((ports) => {
       const [scheme, hostPort, containerPort] = ports
         .trim()
         .replace(/\s+/g, ' ')
-        .split(' ');
+        .split(' ')
+        .filter(Boolean);
       return {
         scheme,
         hostPort: Number(hostPort),
@@ -176,28 +184,26 @@ export class DokkuClient {
         case 'enabled':
           return value.toLowerCase() === 'true';
         case 'portMap':
-          return value.split(' ');
+          return value.split(' ').filter(Boolean);
         default:
           return value;
       }
     };
     const response = await this.runCommand(`proxy:report ${app}`);
-    return response.output
-      .split('\n')
-      .reduce<AppProxyInfo>(
-        (previousValue, currentValue) =>
-          mergeData<AppProxyInfo>(
-            previousValue,
-            currentValue,
-            keyMapping,
-            getValue
-          ),
-        {
-          enabled: false,
-          portMap: [],
-          type: '',
-        }
-      );
+    return getLines(response.output).reduce<AppProxyInfo>(
+      (previousValue, currentValue) =>
+        mergeData<AppProxyInfo>(
+          previousValue,
+          currentValue,
+          keyMapping,
+          getValue
+        ),
+      {
+        enabled: false,
+        portMap: [],
+        type: '',
+      }
+    );
   }
 
   public async getAppProcessInfo(app: string): Promise<any> {
@@ -229,25 +235,32 @@ export class DokkuClient {
     };
 
     const response = await this.runCommand(`ps:report ${app}`);
-    return response.output
-      .split('\n')
-      .reduce<AppProcessReport>(
-        (previousValue, currentValue) =>
-          mergeData<AppProcessReport>(
-            previousValue,
-            currentValue,
-            keyMapping,
-            getValue
-          ),
-        {
-          deployed: false,
-          processes: 0,
-          psCanScale: false,
-          psRestartPolicy: null,
-          restore: false,
-          running: false,
-        }
-      );
+    return getLines(response.output).reduce<AppProcessReport>(
+      (previousValue, currentValue) =>
+        mergeData<AppProcessReport>(
+          previousValue,
+          currentValue,
+          keyMapping,
+          getValue
+        ),
+      {
+        deployed: false,
+        processes: 0,
+        psCanScale: false,
+        psRestartPolicy: null,
+        restore: false,
+        running: false,
+      }
+    );
+  }
+
+  public async createApp(app: string): string {
+    // TODO: request validation
+    // if (!appName) {
+    //   throw new Error();
+    // }
+    const response = await this.runCommand(`apps:create ${app}`);
+    return response.output;
   }
 }
 

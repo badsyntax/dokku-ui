@@ -44,8 +44,8 @@ export const ProgressProvider: React.FunctionComponent = ({ children }) => {
 
 export const Progress: React.FunctionComponent = () => {
   const { isVisible } = useContext(ProgressContext);
-  useEffect(() => {
-    document.body.style.cursor = isVisible ? 'progress' : 'default';
-  }, [isVisible]);
+  // useEffect(() => {
+  //   document.body.style.cursor = isVisible ? 'progress' : 'unset';
+  // }, [isVisible]);
   return isVisible ? <TopBarProgress /> : null;
 };

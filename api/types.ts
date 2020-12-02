@@ -18,3 +18,14 @@ export interface WsMessageSubscription<T = any> {
 export enum WsCommands {
   getAppData = 'getAppData',
 }
+
+export enum ResponseStatus {
+  error = 'error',
+  success = 'success',
+}
+
+export interface ApiResponse<DataType = unknown> {
+  status: ResponseStatus;
+  message?: string;
+  data?: DataType;
+}

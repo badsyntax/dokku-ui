@@ -40,11 +40,11 @@ export interface AppProcessReport {
 
 export interface App {
   name: string;
-  storage: AppStorageVolume[];
-  domains: AppDomains;
-  network: AppNetwork;
-  proxyPorts: AppProxyPort[];
-  proxyInfo: AppProxyInfo;
-  processInfo: unknown;
-  processReport: AppProcessReport;
+  storage?: AppStorageVolume[];
+  domains?: AppDomains;
+  network?: AppNetwork;
+  proxyPorts?: AppProxyPort[];
+  proxyInfo?: AppProxyInfo;
+  processInfo?: unknown;
+  processReport?: AppProcessReport;
 }

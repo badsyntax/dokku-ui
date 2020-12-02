@@ -11,7 +11,6 @@ import { ProgressContext } from '../../features/layout/Progress/Progress';
 import { ProgressMessage } from '../../features/layout/ProgressMessage/ProgressMessage';
 
 const Apps: React.FunctionComponent = () => {
-  const [app, setApp] = useState<App>(null);
   const [error, setError] = useState<Error>(null);
   const {
     isVisible: isLoading,
@@ -20,6 +19,9 @@ const Apps: React.FunctionComponent = () => {
   } = useContext(ProgressContext);
   const router = useRouter();
   const { app: appName } = router.query;
+  const [app, setApp] = useState<App>({
+    name: Array.isArray(appName) ? appName[0] : appName,
+  });
 
   useEffect(() => {
     async function fetchData() {
@@ -55,7 +57,7 @@ const Apps: React.FunctionComponent = () => {
           title: 'Apps',
           url: '/apps',
         }}
-        pageActions={app && <AppDetailPageActions app={app.name} />}
+        pageActions={app && <AppDetailPageActions app={app} />}
       />
       {isLoading && <ProgressMessage />}
       {!isLoading && app && <AppDetail app={app} />}

@@ -25,7 +25,7 @@ import BlockIcon from '@material-ui/icons/Block';
 import HttpIcon from '@material-ui/icons/Http';
 import LanguageIcon from '@material-ui/icons/Language';
 import AddIcon from '@material-ui/icons/Add';
-
+import BackupIcon from '@material-ui/icons/Backup';
 export interface AppDetailProps {
   app: App;
 }
@@ -69,37 +69,63 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
   };
   return (
     <Box>
-      <Box mb={2}>
-        <Alert severity="success">This app is running</Alert>
+      <Box mb={2} className={classes.alertsContainer}>
+        {app.processReport?.running && app.processReport?.deployed && (
+          <Alert severity="success">This app is running</Alert>
+        )}
+        {!app.processReport?.running && app.processReport?.deployed && (
+          <Alert severity="warning">This app is not running</Alert>
+        )}
+        {/* {app.processReport?.deployed && (
+          <Alert severity="success">This app is deployed</Alert>
+        )} */}
+        {!app.processReport?.deployed && (
+          <Alert
+            severity="warning"
+            action={
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<BackupIcon />}
+              >
+                Setup Deployment
+              </Button>
+            }
+          >
+            This app is not deployed
+          </Alert>
+        )}
       </Box>
-      <Grid className={classes.grid} container spacing={3}>
-        <Grid item xs={6} md={3}>
-          <Paper className={classes.paper}>
-            <Typography variant="h6">CPU</Typography>
-            <Typography className={classes.paperText}>0.5%</Typography>
-          </Paper>
+      {app.processReport?.running && (
+        <Grid className={classes.grid} container spacing={3}>
+          <Grid item xs={6} md={3}>
+            <Paper className={classes.paper}>
+              <Typography variant="h6">CPU</Typography>
+              <Typography className={classes.paperText}>0.5%</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Paper className={classes.paper}>
+              <Typography variant="h6">Memory</Typography>
+              <Typography className={classes.paperText}>
+                2.113MiB / 1.941GiB (0.11%)
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Paper className={classes.paper}>
+              <Typography variant="h6">Net I/O</Typography>
+              <Typography className={classes.paperText}>1.53kB / 0B</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Paper className={classes.paper}>
+              <Typography variant="h6">Block I/O</Typography>
+              <Typography className={classes.paperText}>7.97MB / 0B</Typography>
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item xs={6} md={3}>
-          <Paper className={classes.paper}>
-            <Typography variant="h6">Memory</Typography>
-            <Typography className={classes.paperText}>
-              2.113MiB / 1.941GiB (0.11%)
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Paper className={classes.paper}>
-            <Typography variant="h6">Net I/O</Typography>
-            <Typography className={classes.paperText}>1.53kB / 0B</Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Paper className={classes.paper}>
-            <Typography variant="h6">Block I/O</Typography>
-            <Typography className={classes.paperText}>7.97MB / 0B</Typography>
-          </Paper>
-        </Grid>
-      </Grid>
+      )}
       <Paper>
         <Box pl={3} pr={3} pb={3} pt={2}>
           <Tabs
@@ -109,62 +135,60 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
             textColor="primary"
             scrollButtons="auto"
           >
-            <Tab label="Storage Volumes" {...a11yProps(0)} />
+            <Tab label="Volumes" {...a11yProps(0)} />
             <Tab label="Environment" {...a11yProps(0)} />
             <Tab label="Domains" {...a11yProps(1)} />
             <Tab label="Proxy" {...a11yProps(2)} />
             <Tab label="Network" {...a11yProps(2)} />
+            <Tab label="TLS" {...a11yProps(2)} />
             <Tab label="Logs" {...a11yProps(2)} />
           </Tabs>
           <TabPanel value={value} index={0}>
-            <Typography variant="h5">Volumes</Typography>
-            <ul>
-              {app.storage.map((storageVolume) => {
-                return (
-                  <li key={storageVolume.host + storageVolume.container}>
-                    <Typography>
-                      {storageVolume.host}:{storageVolume.container}
-                    </Typography>
-                  </li>
-                );
-              })}
-            </ul>
+            <Typography variant="h5" gutterBottom>
+              Volumes
+            </Typography>
+            {!app.storage?.length && (
+              <Box mb={2}>
+                <Alert severity="info">No volumes</Alert>
+              </Box>
+            )}
+            {!!app.storage?.length && (
+              <ul>
+                {app.storage.map((storageVolume) => {
+                  return (
+                    <li key={storageVolume.host + storageVolume.container}>
+                      <Typography>
+                        {storageVolume.host}:{storageVolume.container}
+                      </Typography>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <Button variant="outlined" startIcon={<AddIcon />}>
+              Add Volume
+            </Button>
           </TabPanel>
           <TabPanel value={value} index={1}>
+            <Typography variant="h5" gutterBottom>
+              Environment
+            </Typography>
+            <Box mb={2}>
+              <Alert severity="info">No environment vars</Alert>
+            </Box>
+            <Button variant="outlined" startIcon={<AddIcon />}>
+              Add Environment Var
+            </Button>
+          </TabPanel>
+          <TabPanel value={value} index={2}>
             <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Typography variant="h6">Virtual Hosts</Typography>
-                {/* <Typography>
-                  Enabled: {app.domains.enabled.toString()}
-                </Typography> */}
-                <List component="nav">
-                  {app.domains.vhosts.map((vhost) => {
-                    return (
-                      <ListItem button component={Link} href={vhost}>
-                        <ListItemIcon>
-                          <LanguageIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={vhost} />
-                      </ListItem>
-                    );
-                  })}
-                </List>
-                <Button variant="outlined" startIcon={<AddIcon />}>
-                  Add host
-                </Button>{' '}
-                {app.domains.enabled && (
-                  <Button variant="outlined" startIcon={<BlockIcon />}>
-                    Disable
-                  </Button>
-                )}
-              </Grid>
               <Grid item xs={6}>
                 <Typography variant="h6">Global Virtual Hosts</Typography>
                 {/* <Typography>
                   Enabled: {app.domains.globalEnabled.toString()}
                 </Typography> */}
                 <List component="nav">
-                  {app.domains.globalVhosts.map((vhost) => {
+                  {app.domains?.globalVhosts.map((vhost) => {
                     return (
                       <ListItem button component={Link} href={vhost}>
                         <ListItemIcon>
@@ -178,7 +202,38 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
                 <Button variant="outlined" startIcon={<AddIcon />}>
                   Add host
                 </Button>{' '}
-                {app.domains.globalEnabled && (
+                {app.domains?.globalEnabled && (
+                  <Button variant="outlined" startIcon={<BlockIcon />}>
+                    Disable
+                  </Button>
+                )}
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h6" gutterBottom>
+                  Virtual Hosts
+                </Typography>
+                {/* <Typography>
+                  Enabled: {app.domains.enabled.toString()}
+                </Typography> */}
+                {!app.domains?.vhosts.length && (
+                  <Alert severity="info">No virtual hosts</Alert>
+                )}
+                <List component="nav">
+                  {app.domains?.vhosts.map((vhost) => {
+                    return (
+                      <ListItem button component={Link} href={vhost}>
+                        <ListItemIcon>
+                          <LanguageIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={vhost} />
+                      </ListItem>
+                    );
+                  })}
+                </List>
+                <Button variant="outlined" startIcon={<AddIcon />}>
+                  Add host
+                </Button>{' '}
+                {app.domains?.enabled && (
                   <Button variant="outlined" startIcon={<BlockIcon />}>
                     Disable
                   </Button>
@@ -186,10 +241,10 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
               </Grid>
             </Grid>
           </TabPanel>
-          <TabPanel value={value} index={2}>
+          <TabPanel value={value} index={3}>
             <Typography variant="h5">Ports</Typography>
             <ul>
-              {app.proxyPorts.map((portMap) => {
+              {app.proxyPorts?.map((portMap) => {
                 const key =
                   portMap.scheme +
                   ':' +

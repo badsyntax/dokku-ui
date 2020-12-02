@@ -10,3 +10,6 @@ Installation will be managed with a dokku-ui plugin.
 
 See [DEVELOPMENT.md](./DEVELOPMENT.md)
 
+## TODO
+
+- [ ] Improve data fetching, consider using https://github.com/vercel/swr
