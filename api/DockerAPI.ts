@@ -1,6 +1,5 @@
 import { ImageInfo } from 'dockerode';
 import { HttpAPI } from './HttpAPI';
-import { ApiResponse } from './types';
 
 export type GetImagesResponse = {
   dangling: ImageInfo[];
@@ -8,7 +7,7 @@ export type GetImagesResponse = {
 };
 
 export class DockerAPI extends HttpAPI {
-  getImages(): Promise<ApiResponse<GetImagesResponse>> {
+  getImages(): Promise<GetImagesResponse> {
     return this.getJson<GetImagesResponse>('images');
   }
 }

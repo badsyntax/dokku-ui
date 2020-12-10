@@ -9,7 +9,6 @@ export class TCPClient {
   }
 
   private connect(): void {
-    console.log('TCPClient', `Connecting to ${this.host}:${this.port}`);
     this.socket = new net.Socket()
       .connect(this.port, this.host)
       .on('error', this.handleError)
@@ -19,6 +18,7 @@ export class TCPClient {
   }
 
   private handleConnect = (): void => {
+    console.log('TCPClient', `Connected to ${this.host}:${this.port}`);
     this.isReady = true;
   };
 

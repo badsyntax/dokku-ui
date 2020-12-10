@@ -14,23 +14,26 @@ import {
 } from '@material-ui/core';
 import { Alert, Autocomplete } from '@material-ui/lab';
 import React, { useRef, useState } from 'react';
-import { useStyles } from './CreateAppDialog.styles';
+import { useStyles } from './AddConfigVarDialog.styles';
 import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
 import { dokkuApi } from '../../../api/DokkuAPI';
 import { ProgressButton } from '../../layout/ProgressButton/ProgressButton';
-export interface CreateAppDialogProps {
+import { App } from '../../../dokku/types';
+
+export interface AddConfigVarDialogProps {
+  app: App;
   open: boolean;
   onClose: () => void;
   onCreate: () => void;
 }
 
-export const CreateAppDialog: React.FunctionComponent<CreateAppDialogProps> = ({
+export const AddConfigVarDialog: React.FunctionComponent<AddConfigVarDialogProps> = ({
+  app,
   open,
   onClose,
   onCreate,
 }) => {
-  const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState<string>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const classes = useStyles();
@@ -38,9 +41,9 @@ export const CreateAppDialog: React.FunctionComponent<CreateAppDialogProps> = ({
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-    const formData = new FormData(formRef.current);
+    const formData = new FormData(e.target);
     dokkuApi
-      .createApp(formData.get('name').toString())
+      .addAppConfig(app.name, formData)
       .then(
         () => {
           onClose();
@@ -58,12 +61,12 @@ export const CreateAppDialog: React.FunctionComponent<CreateAppDialogProps> = ({
     <Dialog
       open={open}
       onClose={onClose}
-      aria-labelledby="create-app-dialog-title"
-      aria-describedby="create-app-dialog-description"
+      aria-labelledby="app-add-config-var-dialog-title"
+      aria-describedby="app-add-config-var-description"
     >
-      <form onSubmit={handleFormSubmit} ref={formRef}>
-        <DialogTitle id="create-app-dialog-title">
-          Create App
+      <form onSubmit={handleFormSubmit}>
+        <DialogTitle id="app-add-config-var-title">
+          Add Environment Variable
           <IconButton
             aria-label="close"
             onClick={onClose}
@@ -75,16 +78,43 @@ export const CreateAppDialog: React.FunctionComponent<CreateAppDialogProps> = ({
         <DialogContent dividers className={classes.content}>
           {error && <Alert severity="error">{error}</Alert>}
           <TextField
-            label="Name"
+            label="Key"
             fullWidth
             autoFocus
             required
             margin="normal"
             variant="outlined"
-            name="name"
-            placeholder="Enter a short name for the app..."
+            name="key"
+            placeholder="Key"
             disabled={isLoading}
           />
+
+          <TextField
+            label="Value"
+            fullWidth
+            required
+            margin="normal"
+            variant="outlined"
+            name="value"
+            placeholder="Value"
+            disabled={isLoading}
+            multiline
+            rows={2}
+          />
+          {/* <Autocomplete
+          freeSolo
+          options={['image:version']}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Image"
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              helperText="Optionally enter a local or remote image to use for this app"
+            />
+          )}
+        /> */}
         </DialogContent>
         <DialogActions>
           <Button
@@ -98,6 +128,7 @@ export const CreateAppDialog: React.FunctionComponent<CreateAppDialogProps> = ({
           <ProgressButton
             showProgress={isLoading}
             variant="outlined"
+            color="primary"
             startIcon={<CheckIcon />}
             type="submit"
             disabled={isLoading}

@@ -1,4 +1,10 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useRouter } from 'next/router';
 import { PageHeader } from '../../features/layout/PageHeader/PageHeader';
 import { App } from '../../dokku/types';
@@ -23,31 +29,36 @@ const Apps: React.FunctionComponent = () => {
     name: Array.isArray(appName) ? appName[0] : appName,
   });
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!appName || Array.isArray(appName)) {
-        return;
-      }
-      showProgress();
-      const { streamingAPI } = await import(
-        /* webpackChunkName: 'StreamingApi' */ '../../api/StreamingAPI'
-      );
-      const unsubscribe = streamingAPI.getAppData(
-        appName,
-        (message: WsServerMessage<ContainerStats>) => {
-          // TODO: update state
-        }
-      );
-      const { dokkuApi } = await import(
-        /* webpackChunkName: 'DokkuAPI' */ '../../api/DokkuAPI'
-      );
-      dokkuApi.getApp(appName).then(setApp, setError).finally(hideProgress);
+  const loadApp = useCallback(async () => {
+    if (!appName || Array.isArray(appName)) {
+      return;
     }
-    fetchData();
+    showProgress();
+    const { streamingAPI } = await import(
+      /* webpackChunkName: 'StreamingApi' */ '../../api/StreamingAPI'
+    );
+    const unsubscribe = streamingAPI.getAppData(
+      appName,
+      (message: WsServerMessage<ContainerStats>) => {
+        // TODO: update state
+      }
+    );
+    const { dokkuApi } = await import(
+      /* webpackChunkName: 'DokkuAPI' */ '../../api/DokkuAPI'
+    );
+    dokkuApi.getApp(appName).then(setApp, setError).finally(hideProgress);
+  }, [appName, hideProgress]);
+
+  const handleReloadApp = () => {
+    loadApp();
+  };
+
+  useEffect(() => {
+    loadApp();
     return () => {
       // FIXME: kill the stream
     };
-  }, [appName, hideProgress, showProgress]);
+  }, [appName, loadApp]);
 
   return (
     <Fragment>
@@ -60,7 +71,9 @@ const Apps: React.FunctionComponent = () => {
         pageActions={app && <AppDetailPageActions app={app} />}
       />
       {isLoading && <ProgressMessage />}
-      {!isLoading && app && <AppDetail app={app} />}
+      {!isLoading && app && (
+        <AppDetail app={app} onReloadApp={handleReloadApp} />
+      )}
       {error && <DokkuClientError error={error} />}
     </Fragment>
   );

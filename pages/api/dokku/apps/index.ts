@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiResponse, ResponseStatus } from '../../../../api/types';
+import { ApiResponse } from '../../../../api/types';
 import { dokkuClient } from '../../../../dokku/DokkuClient';
 
 export default async (
@@ -12,10 +12,13 @@ export default async (
     case 'GET': {
       const apps = await dokkuClient.getApps();
       res.status(200).json({
-        status: ResponseStatus.success,
+        ok: true,
         data: apps,
       });
       break;
     }
+    default:
+      res.setHeader('Allow', ['GET']);
+      res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 };

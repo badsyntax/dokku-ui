@@ -9,7 +9,6 @@ export class IPCClient {
   }
 
   private connect(): void {
-    console.log('IPCClient', `Connecting to ${this.socketPath}`);
     this.socket = net
       .createConnection(this.socketPath)
       .on('connect', this.handleConnect)
@@ -18,6 +17,7 @@ export class IPCClient {
   }
 
   private handleConnect = (): void => {
+    console.log('IPCClient', `Connected to ${this.socketPath}`);
     this.isReady = true;
   };
 

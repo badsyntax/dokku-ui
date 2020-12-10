@@ -1,33 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  AppBar,
   Box,
   Button,
-  Checkbox,
-  Divider,
-  FormControlLabel,
   Grid,
-  Link,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Paper,
   Tab,
   Tabs,
+  Divider,
   Typography,
+  AppBar,
 } from '@material-ui/core';
 import { App } from '../../../dokku/types';
 import { useStyles } from './AppDetail.styles';
 import { Alert } from '@material-ui/lab';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-import BlockIcon from '@material-ui/icons/Block';
-import HttpIcon from '@material-ui/icons/Http';
-import LanguageIcon from '@material-ui/icons/Language';
-import AddIcon from '@material-ui/icons/Add';
 import BackupIcon from '@material-ui/icons/Backup';
+import { AppDomains } from '../AppDomains/AppDomains';
+import { AppVolumes } from '../AppVolumes/AppVolumes';
+import { AppConfig } from '../AppConfig/AppConfig';
+import { AppDeploy } from '../AppDeploy/AppDeploy';
+import { SectionDivider } from '../../layout/SectionDivider/SectionDivider';
 export interface AppDetailProps {
   app: App;
+  onReloadApp: () => void;
 }
 
 interface TabPanelProps {
@@ -59,7 +53,10 @@ function a11yProps(index: any) {
   };
 }
 
-export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
+export const AppDetail: React.FunctionComponent<AppDetailProps> = ({
+  app,
+  onReloadApp,
+}) => {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
@@ -76,9 +73,6 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
         {!app.processReport?.running && app.processReport?.deployed && (
           <Alert severity="warning">This app is not running</Alert>
         )}
-        {/* {app.processReport?.deployed && (
-          <Alert severity="success">This app is deployed</Alert>
-        )} */}
         {!app.processReport?.deployed && (
           <Alert
             severity="warning"
@@ -92,7 +86,7 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
               </Button>
             }
           >
-            This app is not deployed
+            This app is not deployed.
           </Alert>
         )}
       </Box>
@@ -126,122 +120,33 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
           </Grid>
         </Grid>
       )}
+
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        indicatorColor="primary"
+        textColor="primary"
+        scrollButtons="auto"
+        variant="fullWidth"
+      >
+        <Tab label="Overview" {...a11yProps(0)} />
+        <Tab label="Domains" {...a11yProps(1)} />
+        <Tab label="Network" {...a11yProps(2)} />
+        <Tab label="Settings" {...a11yProps(3)} />
+        <Tab label="Deploy" {...a11yProps(3)} />
+        <Tab label="Logs" {...a11yProps(4)} />
+      </Tabs>
+      <br />
       <Paper>
         <Box pl={3} pr={3} pb={3} pt={2}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            indicatorColor="primary"
-            textColor="primary"
-            scrollButtons="auto"
-          >
-            <Tab label="Volumes" {...a11yProps(0)} />
-            <Tab label="Environment" {...a11yProps(0)} />
-            <Tab label="Domains" {...a11yProps(1)} />
-            <Tab label="Proxy" {...a11yProps(2)} />
-            <Tab label="Network" {...a11yProps(2)} />
-            <Tab label="TLS" {...a11yProps(2)} />
-            <Tab label="Logs" {...a11yProps(2)} />
-          </Tabs>
           <TabPanel value={value} index={0}>
-            <Typography variant="h5" gutterBottom>
-              Volumes
-            </Typography>
-            {!app.storage?.length && (
-              <Box mb={2}>
-                <Alert severity="info">No volumes</Alert>
-              </Box>
-            )}
-            {!!app.storage?.length && (
-              <ul>
-                {app.storage.map((storageVolume) => {
-                  return (
-                    <li key={storageVolume.host + storageVolume.container}>
-                      <Typography>
-                        {storageVolume.host}:{storageVolume.container}
-                      </Typography>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-            <Button variant="outlined" startIcon={<AddIcon />}>
-              Add Volume
-            </Button>
+            Overview
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <Typography variant="h5" gutterBottom>
-              Environment
-            </Typography>
-            <Box mb={2}>
-              <Alert severity="info">No environment vars</Alert>
-            </Box>
-            <Button variant="outlined" startIcon={<AddIcon />}>
-              Add Environment Var
-            </Button>
+            <AppDomains app={app} />
           </TabPanel>
           <TabPanel value={value} index={2}>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Typography variant="h6">Global Virtual Hosts</Typography>
-                {/* <Typography>
-                  Enabled: {app.domains.globalEnabled.toString()}
-                </Typography> */}
-                <List component="nav">
-                  {app.domains?.globalVhosts.map((vhost) => {
-                    return (
-                      <ListItem button component={Link} href={vhost}>
-                        <ListItemIcon>
-                          <LanguageIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={vhost} />
-                      </ListItem>
-                    );
-                  })}
-                </List>
-                <Button variant="outlined" startIcon={<AddIcon />}>
-                  Add host
-                </Button>{' '}
-                {app.domains?.globalEnabled && (
-                  <Button variant="outlined" startIcon={<BlockIcon />}>
-                    Disable
-                  </Button>
-                )}
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h6" gutterBottom>
-                  Virtual Hosts
-                </Typography>
-                {/* <Typography>
-                  Enabled: {app.domains.enabled.toString()}
-                </Typography> */}
-                {!app.domains?.vhosts.length && (
-                  <Alert severity="info">No virtual hosts</Alert>
-                )}
-                <List component="nav">
-                  {app.domains?.vhosts.map((vhost) => {
-                    return (
-                      <ListItem button component={Link} href={vhost}>
-                        <ListItemIcon>
-                          <LanguageIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={vhost} />
-                      </ListItem>
-                    );
-                  })}
-                </List>
-                <Button variant="outlined" startIcon={<AddIcon />}>
-                  Add host
-                </Button>{' '}
-                {app.domains?.enabled && (
-                  <Button variant="outlined" startIcon={<BlockIcon />}>
-                    Disable
-                  </Button>
-                )}
-              </Grid>
-            </Grid>
-          </TabPanel>
-          <TabPanel value={value} index={3}>
+            Network
             <Typography variant="h5">Ports</Typography>
             <ul>
               {app.proxyPorts?.map((portMap) => {
@@ -258,6 +163,14 @@ export const AppDetail: React.FunctionComponent<AppDetailProps> = ({ app }) => {
                 );
               })}
             </ul>
+          </TabPanel>
+          <TabPanel value={value} index={3}>
+            <AppVolumes app={app} />
+            <SectionDivider />
+            <AppConfig app={app} onAddConfigVar={onReloadApp} />
+          </TabPanel>
+          <TabPanel value={value} index={4}>
+            <AppDeploy app={app} />
           </TabPanel>
         </Box>
       </Paper>

@@ -8,6 +8,7 @@ import {
   AppProxyPort,
   AppProxyInfo,
   AppProcessReport,
+  AppConfig,
 } from './types';
 
 interface DokkuResponse {
@@ -208,10 +209,19 @@ export class DokkuClient {
 
   public async getAppProcessInfo(app: string): Promise<any> {
     const response = await this.runCommand(`ps:inspect ${app}`);
-    return JSON.parse(response.output);
+    const processInfo = JSON.parse(response.output);
+    return processInfo;
   }
 
   public async getAppProcessReport(app: string): Promise<AppProcessReport> {
+    // return Promise.resolve({
+    //   deployed: false,
+    //   processes: 0,
+    //   psCanScale: true,
+    //   psRestartPolicy: 'on-failure:10',
+    //   restore: true,
+    //   running: false,
+    // });
     const keyMapping = {
       Deployed: 'deployed',
       Processes: 'processes',
@@ -235,7 +245,7 @@ export class DokkuClient {
     };
 
     const response = await this.runCommand(`ps:report ${app}`);
-    return getLines(response.output).reduce<AppProcessReport>(
+    const processReport = getLines(response.output).reduce<AppProcessReport>(
       (previousValue, currentValue) =>
         mergeData<AppProcessReport>(
           previousValue,
@@ -252,15 +262,44 @@ export class DokkuClient {
         running: false,
       }
     );
+    return processReport;
   }
 
-  public async createApp(app: string): string {
+  public async createApp(app: string): Promise<string> {
     // TODO: request validation
     // if (!appName) {
     //   throw new Error();
     // }
     const response = await this.runCommand(`apps:create ${app}`);
     return response.output;
+  }
+
+  public async getAppConfig(app: string): Promise<AppConfig[]> {
+    const response = await this.runCommand(`config:show ${app}`);
+    return parseLines<AppConfig>(response, (config) => {
+      const [key, value] = config.split(':');
+      return { key: key.trim(), value: value.trim() };
+    });
+  }
+
+  public async addAppConfig(
+    app: string,
+    key: string,
+    value: string
+  ): Promise<string> {
+    const response = await this.runCommand(
+      `config:set --no-restart ${app} ${key}=${value}`
+    );
+    return response.output;
+  }
+
+  public async deployApp(
+    app: string,
+    dockerImage: string,
+    tag = 'latest'
+  ): Promise<string> {
+    const response2 = await this.runCommand(`tags:deploy ${app} ${tag}`);
+    return response2.output;
   }
 }
 

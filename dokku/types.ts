@@ -38,6 +38,11 @@ export interface AppProcessReport {
   running: boolean;
 }
 
+export interface AppConfig {
+  key: string;
+  value: string;
+}
+
 export interface App {
   name: string;
   storage?: AppStorageVolume[];
@@ -47,4 +52,5 @@ export interface App {
   proxyInfo?: AppProxyInfo;
   processInfo?: unknown;
   processReport?: AppProcessReport;
+  config?: AppConfig[];
 }

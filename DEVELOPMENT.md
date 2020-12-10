@@ -44,7 +44,7 @@ with:
 Start the `dokku` VM using `vagrant`:
 
 ```sh
-vagrant up dokku
+BOX_MEMORY=2048 BOX_CPUS=2 vagrant up dokku
 ```
 
 Visit http://dokku.me to complete the installation.

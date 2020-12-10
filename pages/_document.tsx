@@ -83,6 +83,10 @@ export default class MyDocument extends Document {
             href="https://cdn.jsdelivr.net/gh/dokku/dokku@v0.21.4/docs/assets/favicons/favicon-16x16.png"
             sizes="16x16"
           />
+          <link
+            rel="stylesheet"
+            href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css"
+          ></link>
         </Head>
         <body>
           <Main />

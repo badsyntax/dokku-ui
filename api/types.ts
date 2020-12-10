@@ -19,13 +19,8 @@ export enum WsCommands {
   getAppData = 'getAppData',
 }
 
-export enum ResponseStatus {
-  error = 'error',
-  success = 'success',
-}
-
 export interface ApiResponse<DataType = unknown> {
-  status: ResponseStatus;
+  ok: boolean;
   message?: string;
   data?: DataType;
 }
